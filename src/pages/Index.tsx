@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   const [promoCode, setPromoCode] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
   const { toast } = useToast();
 
   const ucPackages = [
@@ -41,18 +42,28 @@ const Index = () => {
   ];
 
   const handleApplyPromo = () => {
-    if (promoCode) {
+    if (promoCode.toLowerCase() === 'magascha') {
+      setAppliedPromo('magascha');
       toast({
         title: '🎉 Промокод применён!',
-        description: `Промокод "${promoCode}" даёт скидку 5%`,
+        description: 'Промокод "MAGASCHA" даёт скидку 100% - UC БЕСПЛАТНО!',
+      });
+    } else if (promoCode) {
+      toast({
+        title: '❌ Неверный промокод',
+        description: `Промокод "${promoCode}" не найден`,
+        variant: 'destructive',
       });
     }
   };
 
   const handleBuyPackage = (amount: number, price: number) => {
+    const finalPrice = appliedPromo === 'magascha' ? 0 : price;
     toast({
       title: '✅ Пакет добавлен в корзину',
-      description: `${amount} UC за ${price}₽`,
+      description: appliedPromo === 'magascha' 
+        ? `${amount} UC БЕСПЛАТНО! 🎉` 
+        : `${amount} UC за ${price}₽`,
     });
   };
 
@@ -160,7 +171,14 @@ const Index = () => {
                   </div>
                   <CardTitle className="text-3xl">{pkg.amount} UC</CardTitle>
                   <CardDescription className="text-2xl font-bold text-primary mt-2">
-                    {pkg.price}₽
+                    {appliedPromo === 'magascha' ? (
+                      <>
+                        <span className="line-through text-muted-foreground text-lg">{pkg.price}₽</span>
+                        <span className="block text-3xl text-secondary">БЕСПЛАТНО!</span>
+                      </>
+                    ) : (
+                      `${pkg.price}₽`
+                    )}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -310,7 +328,7 @@ const Index = () => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-4">Специальное предложение</h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Используйте промокод <span className="text-primary font-bold">MAGASCHA10</span> и получите скидку 10%
+            Используйте промокод <span className="text-secondary font-bold text-3xl">MAGASCHA</span> и получите UC <span className="text-secondary font-bold">БЕСПЛАТНО!</span>
           </p>
           <Button size="lg" className="animate-glow">
             <Icon name="Gift" size={20} className="mr-2" />
